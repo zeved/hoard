@@ -1,0 +1,24 @@
+{
+  "name": "hoard",
+  "version": "1.0.0",
+  "description": "secure JSON-based file storage module for NodeJS",
+  "main": "hoard.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeved/hoard.git"
+  },
+  "author": "Zevedei Ionut <izvd@tutanota.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zeved/hoard/issues"
+  },
+  "homepage": "https://github.com/zeved/hoard#readme",
+  "dependencies": {
+    "@msgpack/msgpack": "^1.12.2",
+    "crypto-js": "^4.0.0",
+    "msgpack5": "^4.2.1"
+  }
+}
