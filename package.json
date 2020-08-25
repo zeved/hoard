@@ -17,8 +17,6 @@
   },
   "homepage": "https://github.com/zeved/hoard#readme",
   "dependencies": {
-    "@msgpack/msgpack": "^1.12.2",
-    "crypto-js": "^4.0.0",
-    "msgpack5": "^4.2.1"
+    "crypto-js": "^4.0.0"
   }
 }

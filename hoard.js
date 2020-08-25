@@ -52,7 +52,7 @@ const isValidKey = (key) => {
     }
 
     if (key.length < 32) {
-      throw new Error('[isValidKey]: key must be exactly 16 bytes long');
+      throw new Error('[isValidKey]: key must be exactly 32 bytes long');
     }
 
     return true;
@@ -125,6 +125,7 @@ const unlock = (hoard, key) => {
  *
  * @param {string} encrypted hoard
  * @param {string} path
+ * @returns {boolean} saved status
  */
 const save = async (hoard, path) => {
   try {
@@ -132,10 +133,12 @@ const save = async (hoard, path) => {
       throw new Error('[save]: invalid hoard; must be a string');
     }
 
-    await fs.writeFileSync(`${path}.hoard`, hoard);
+    await fs.writeFileSync(path, hoard);
+    return true;
   }
   catch (error) {
     console.error(error);
+    return false;
   }
 };
 
@@ -168,11 +171,112 @@ const load = async (path, key) => {
     console.error(error);
     return null;
   }
-}
+};
+
+/**
+ * updates an existing hoard's value
+ *
+ * @param {string} path
+ * @param {Buffer} key
+ * @param {string} object key to update
+ * @param {any} value
+ * @returns {boolean} update status
+ */
+const updateValue = async (path, key, objKey, objValue) => {
+  try {
+    const unlockedHoard = await load(path, key);
+    if (!unlockedHoard) {
+      throw new Error('[update]: failed unlocking hoard');
+    }
+
+    unlockedHoard[objKey] = objValue;
+
+    const lockedHoard = lock(Buffer.from(JSON.stringify(unlockedHoard)), key);
+    if (!lockedHoard) {
+      throw new Error('[update]: failed locking hoard');
+    }
+    if (!save(lockedHoard, path)) {
+      throw new Error('[update]: failed saving hoard');
+    }
+    return true;
+  }
+  catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+/**
+ * adds keyvalue pair to a hoard
+ *
+ * @param {string} path
+ * @param {Buffer} key
+ * @param {string} object key to add
+ * @param {any} value
+ * @returns {boolean} add status
+ */
+const addValue = async (path, key, newObjKey, newObjValue) => {
+  try {
+    const unlockedHoard = await load(path, key);
+    if (!unlockedHoard) {
+      throw new Error('[update]: failed unlocking hoard');
+    }
+
+    unlockedHoard[newObjKey] = newObjValue;
+
+    const lockedHoard = lock(Buffer.from(JSON.stringify(unlockedHoard)), key);
+    if (!lockedHoard) {
+      throw new Error('[update]: failed locking hoard');
+    }
+    if (!save(lockedHoard, path)) {
+      throw new Error('[update]: failed saving hoard');
+    }
+    return true;
+  }
+  catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+/**
+ * removes key value pair from hoard
+ *
+ * @param {string} path
+ * @param {Buffer} key
+ * @param {string} object key to remove
+ * @returns {boolean} remove status
+ */
+const deleteValue = async (path, key, objKey) => {
+  try {
+    const unlockedHoard = await load(path, key);
+    if (!unlockedHoard) {
+      throw new Error('[update]: failed unlocking hoard');
+    }
+
+    delete unlockedHoard[objKey];
+
+    const lockedHoard = lock(Buffer.from(JSON.stringify(unlockedHoard)), key);
+    if (!lockedHoard) {
+      throw new Error('[update]: failed locking hoard');
+    }
+    if (!save(lockedHoard, path)) {
+      throw new Error('[update]: failed saving hoard');
+    }
+    return true;
+  }
+  catch (error) {
+    console.error(error);
+    return false;
+  }
+};
 
 module.exports = {
   lock,
   unlock,
   save,
   load,
+  addValue,
+  updateValue,
+  deleteValue,
 };
